@@ -14,6 +14,7 @@ public class CharacterScript : MonoBehaviour
     private float playerSpeed = 2.5f;
     private float jumpHeight = 1.5f;
     private float gravityValue = -9.81f;
+    private MoveState prevMoveState = MoveState.Idle; 
 
     void Start()
     {
@@ -26,11 +27,17 @@ public class CharacterScript : MonoBehaviour
 
     void Update()
     {
-        MoveState moveState = MoveState.Idle;
+        MoveState moveState = (MoveState)animator.GetInteger("MoveState");
+
         groundedPlayer = characterController.isGrounded;
         if (groundedPlayer && playerVelocity.y < 0)
         {
             playerVelocity.y = 0f;
+
+            if(moveState == MoveState.Jump) {
+                moveState = MoveState.JumpFinish;
+            }
+           
         }
         Vector2 moveValue = moveAction.ReadValue<Vector2>();
         float sprintValue = sprintAction.ReadValue<float>();
@@ -44,21 +51,43 @@ public class CharacterScript : MonoBehaviour
             moveValue.x * Camera.main.transform.right +
             moveValue.y * cameraForward
         );
-        if(moveStep.magnitude > 0f) {
-            moveState = sprintValue != 0 ? MoveState.Run : Mathf.Abs(moveValue.x ) >  Mathf.Abs(moveValue.y) ? MoveState.SideWalk : MoveState.Walk; 
+
+        if(!isJumping(moveState)) {
+            if(moveStep.magnitude > 0f) {
+                moveState = Mathf.Abs(moveValue.x ) >  Mathf.Abs(moveValue.y) ? (sprintValue != 0 ? MoveState.SideRun : MoveState.SideWalk) : (sprintValue != 0 ? MoveState.Run : MoveState.Walk);
+                this.transform.forward = cameraForward;
+            }
+            else {
+              
+                moveState = MoveState.Idle;
+                
+            }
         }
-        this.transform.forward = cameraForward;
+       
         characterController.Move(moveStep);
         // Makes the player jump
         if (jumpAction.ReadValue<float>() > 0 && groundedPlayer)
         {
+            moveState = MoveState.JumpStart;
             playerVelocity.y += Mathf.Sqrt(jumpHeight * -2.0f * gravityValue);
         }
 
         playerVelocity.y += gravityValue * Time.deltaTime;
         characterController.Move(playerVelocity * Time.deltaTime);
-
-        animator.SetInteger("MoveState", (int)moveState); 
+        if(moveState != prevMoveState) {
+           animator.SetInteger("MoveState", (int)moveState);   
+           prevMoveState = moveState;
+        }
+       
+    }
+    private bool isJumping (MoveState moveState) {
+        return moveState == MoveState.JumpStart || moveState == MoveState.Jump || moveState == MoveState.JumpFinish;
+    }
+    private void OnJumpStartAnimationsEnds () {
+        animator.SetInteger("MoveState", (int)MoveState.Jump);   
+    }
+    private void OnJumpFinishAnimationsEnds () {
+        animator.SetInteger("MoveState", (int)MoveState.Idle);   
     }
 }
 
@@ -66,5 +95,9 @@ enum MoveState {
     Idle = 1,
     Walk = 2,
     SideWalk = 3,
-    Run = 4
+    Run = 4,
+    SideRun = 5,
+    JumpStart = 6,
+    Jump = 7,
+    JumpFinish = 8
 }
