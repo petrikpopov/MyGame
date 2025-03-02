@@ -29,9 +29,11 @@ public class GameControllerScript : MonoBehaviour
                                 || coinDelta.magnitude < minCoinCharacterDistance 
                                 || coinPosition.x < minCoinMapOffset || coinPosition.z < minCoinMapOffset || coinPosition.x > 1000 - minCoinMapOffset || coinPosition.z > 1000 - minCoinMapOffset) );
             coinPosition.y  = Terrain.activeTerrain.SampleHeight(coinPosition) + Random.Range(minCoinHeight, maxCoinHeight);
-            GameObject.Instantiate(coinPrefab).transform.position  = coinPosition;
+            GameObject coin = GameObject.Instantiate(coinPrefab);
+            coin.transform.position  = coinPosition;
+
+            GameEventController.EmitEvent("SpawnCoin", coin);
         }
-        Debug.Log(type + " " + payload);
     }
 
     private void OnDestroy()

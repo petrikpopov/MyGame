@@ -27,6 +27,7 @@ public class DayNightScript : MonoBehaviour
         {
             dayHour -= 24;
         }
+        GameState.gameTime24 = dayHour;
         DayPhase dayPhase = PhaseFromHour(dayHour); 
         float coef;
         if(dayPhase == DayPhase.Night) 
