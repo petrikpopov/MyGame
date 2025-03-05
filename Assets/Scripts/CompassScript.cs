@@ -17,7 +17,11 @@ public class CompassScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(coin == null) return;
+        if(coin == null) {
+            var go = GameObject.FindGameObjectWithTag("Coin");
+            if(go == null) return;
+            else coin = go.transform;
+        }
         
         Vector3 d = coin.position - character.position;
         Vector3 f = Camera.main.transform.forward;
