@@ -2,21 +2,29 @@ using UnityEngine;
 
 public class CompassScript : MonoBehaviour
 {
+    private GameObject content;
     private Transform arrow;
     private Transform character;
     private Transform coin;
     void Start()
     {
-        arrow = transform.Find("Arrow");
+        content = transform.Find("Content").gameObject;
+        arrow = content.transform.Find("Arrow");
         character = GameObject.Find("Character").transform;
         coin = GameObject.Find("Coin").transform;
         GameEventController.AddListener("SpawnCoin", OnCoinSpawnEvent);
         GameEventController.AddListener("Disappear", OnDisappearEvent);
+        GameEventController.AddListener(nameof(GameState), OnGameStateChangedEvent);
+        content.SetActive(GameState.isCompasVisible);
     }
 
     // Update is called once per frame
     void Update()
     {
+        if(!content.activeInHierarchy) {
+            return;
+        }
+
         if(coin == null) {
             var go = GameObject.FindGameObjectWithTag("Coin");
             if(go == null) return;
@@ -42,9 +50,15 @@ public class CompassScript : MonoBehaviour
         }
     }
 
+    private void OnGameStateChangedEvent(string type, object payload) {
+        if(payload.Equals(nameof(GameState.isCompasVisible))) {
+           content.SetActive(GameState.isCompasVisible);
+        }
+    }
     private void OnDestroy()
     {
         GameEventController.RemoveListener("SpawnCoin", OnCoinSpawnEvent);
         GameEventController.RemoveListener("Disappear", OnDisappearEvent);
+        GameEventController.RemoveListener(nameof(GameState), OnGameStateChangedEvent);
     }
 }
