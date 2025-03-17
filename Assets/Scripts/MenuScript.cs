@@ -14,12 +14,15 @@ public class MenuScript : MonoBehaviour
             Destroy(this.gameObject);
         }
         content = transform.Find("Content").gameObject;
+
+        Time.timeScale = this.gameObject.activeInHierarchy ? 0.0f : 1.0f;
     }
 
     void Update()
     {
        if(Input.GetKeyDown(KeyCode.Escape)) {
             content.SetActive(!content.activeInHierarchy);
+            Time.timeScale = 1.0f - Time.timeScale;
        }
 
         if(Input.GetKeyDown(KeyCode.Alpha1)) {
