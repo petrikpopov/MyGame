@@ -6,6 +6,9 @@ public class MenuDifficultScript : MonoBehaviour
     private Toggle compassToggle;
     private Toggle clockToggle;
     private Toggle hintsToggle;
+    private Slider coinSpawnZoneSlider;
+    private Slider coinProbabilitySlider;
+    private Slider staminaSlider;
     void Start()
     {
         Transform layout1 = transform.Find("Content/GameDifficulty/Layout1");
@@ -19,15 +22,34 @@ public class MenuDifficultScript : MonoBehaviour
         hintsToggle.isOn = GameState.isHintsVisible;
 
         Transform layout2 = transform.Find("Content/GameDifficulty/Layout2");
+
+        coinSpawnZoneSlider = layout2.Find("CoinSpawnZone/Slider").GetComponent<Slider>();
+        coinSpawnZoneSlider.value = 1 - Mathf.Sqrt(
+        (GameState.coinSpawnDistance - GameState.coinSpawnDistanceMin) /
+        (GameState.coinSpawnDistanceMax - GameState.coinSpawnDistanceMin));
+
+        coinProbabilitySlider = layout2.Find("CoinProbability/Slider").GetComponent<Slider>();
+        coinProbabilitySlider.value = GameState.coinSpawnProbability;
+
+        staminaSlider = layout2.Find("Stamina/Slider").GetComponent<Slider>();
+        staminaSlider.value = GameState.maxStamina;
     }
 
     void Update()
     {
         
     }
+    public void OnStaminaSlider(float value) {
+        GameState.maxStamina = value * GameState.maxPossibleStamina;
+    }
+    public void OnCoinProbabilitySlider(float value) {
+        GameState.coinSpawnProbability = value;
+    }
     public void OnCoinZooneSlider(float value) 
     {
-
+        float x = 1 - value;
+        GameState.coinSpawnDistance = GameState.coinSpawnDistanceMin + (GameState.coinSpawnDistanceMax - GameState.coinSpawnDistanceMin) * x * x;
+        Debug.Log("CoinSpawnDistance: " + GameState.coinSpawnDistance);
     }
     public void onCompasToggle (bool value) 
     {

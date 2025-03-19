@@ -2291,7 +2291,7 @@ GameObject:
   m_Component:
   - component: {fileID: 662609128}
   m_Layer: 5
-  m_Name: Item
+  m_Name: CoinSpawnZone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2786,7 +2786,7 @@ GameObject:
   m_Component:
   - component: {fileID: 746397482}
   m_Layer: 5
-  m_Name: Item (1)
+  m_Name: CoinProbability
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5989,7 +5989,19 @@ MonoBehaviour:
   m_Value: 0.16
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 198394273}
+        m_TargetAssemblyTypeName: MenuDifficultScript, Assembly-CSharp
+        m_MethodName: OnCoinProbabilitySlider
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1607285801
 GameObject:
   m_ObjectHideFlags: 0
@@ -6256,7 +6268,19 @@ MonoBehaviour:
   m_Value: 0.16
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 198394273}
+        m_TargetAssemblyTypeName: MenuDifficultScript, Assembly-CSharp
+        m_MethodName: OnCoinZooneSlider
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1637063947
 GameObject:
   m_ObjectHideFlags: 0

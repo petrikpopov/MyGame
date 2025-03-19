@@ -41,6 +41,25 @@ public class CharacterScript : MonoBehaviour
         }
         Vector2 moveValue = moveAction.ReadValue<Vector2>();
         float sprintValue = sprintAction.ReadValue<float>();
+
+        if(sprintValue > 0 && moveValue.magnitude > 0) {
+            if(GameState.stamina > 0.1f) {
+                GameState.stamina -= Time.deltaTime;
+            }
+            else 
+            {
+                sprintValue = 0;
+            }
+        }
+        else {
+            if(GameState.stamina < GameState.maxStamina) {
+                GameState.stamina += Time.deltaTime;
+                if(GameState.stamina > GameState.maxStamina) {
+                    GameState.stamina = GameState.maxStamina;
+                }
+            }
+        }
+
         Vector3 cameraForward = Camera.main.transform.forward;
         cameraForward.y = 0;
         if(cameraForward != Vector3.zero)
