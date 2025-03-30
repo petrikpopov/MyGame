@@ -5,6 +5,17 @@ public class GameState
     public static float gameTime24 {set; get;} = 12.0f;
     public static float maxCoinSpawnDistance {set; get;} = 30.0f;
 
+    #region activeSceneIndex
+    public static int _activeSceneIndex = 0;
+    public static int activeSceneIndex {
+        set {
+            if(_activeSceneIndex != value){
+                _activeSceneIndex= value;
+                GameEventController.EmitEvent(nameof(GameState), nameof(activeSceneIndex));
+            }
+        } get => _activeSceneIndex;
+    }
+    #endregion
 
     public static float _coinSpawnProbability {set; get;} = 0.5f;
     public const int minCoinsOnScene = 20;
