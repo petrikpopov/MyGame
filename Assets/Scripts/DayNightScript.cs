@@ -3,25 +3,26 @@ using UnityEngine;
 
 public class DayNightScript : MonoBehaviour
 {
-    private float dayDuration = 1000.0f;
+    private float dayDuration = 3000.0f;
     private float rotateAngle;
     private float dayHour;
     private float dayPhase;
     private Light sun;
      private Light moon;
-    private Material daySkyBox;
+  
     void Start()
     {
         rotateAngle = -360.0f / dayDuration;
         dayHour = 12;
         sun = transform.Find("Sun").gameObject.GetComponent<Light>();
         moon = transform.Find("Moon").gameObject.GetComponent<Light>();
-        daySkyBox = RenderSettings.skybox;
+        GameEventController.AddListener(nameof(GameState), OnGameEvent);
     }
 
     // Update is called once per frame
     void Update()
     {
+        DayPhase prevDayPhase = PhaseFromHour(dayHour);
         dayHour += 24 * Time.deltaTime / dayDuration;
         if(dayHour >= 24) 
         {
@@ -29,6 +30,9 @@ public class DayNightScript : MonoBehaviour
         }
         GameState.gameTime24 = dayHour;
         DayPhase dayPhase = PhaseFromHour(dayHour); 
+        if(prevDayPhase!=dayPhase) {
+            DayPhaseChanged();
+        }
         float coef;
         if(dayPhase == DayPhase.Night) 
         {
@@ -43,6 +47,7 @@ public class DayNightScript : MonoBehaviour
             coef = Mathf.Cos(cosAng) / 3;
             RenderSettings.sun = moon;
             moon.intensity = coef;
+            coef *= 2.0f;
         }
         else
         {   
@@ -52,11 +57,24 @@ public class DayNightScript : MonoBehaviour
             sun.intensity = coef;
         }
         RenderSettings.ambientIntensity = coef;
-        daySkyBox.SetFloat("_Exposure", coef);
+        RenderSettings.skybox.SetFloat("_Exposure", coef);
 
         this.transform.Rotate(0 , 0 , rotateAngle * Time.deltaTime);
     }
 
+    private void DayPhaseChanged () {
+        DayPhase dayPhase = PhaseFromHour(dayHour);
+        if(dayPhase == DayPhase.Night) {
+            if(GameState.nightSkybox != null) {
+                RenderSettings.skybox = GameState.nightSkybox;
+            }
+        }
+        else {
+            if(GameState.daySkybox != null) {
+                RenderSettings.skybox = GameState.daySkybox;
+            }
+        }
+    }
     private DayPhase PhaseFromHour(float hour) 
     {
         if(hour > 20 || hour < 4) {
@@ -69,6 +87,25 @@ public class DayNightScript : MonoBehaviour
             return DayPhase.Dusk;
         }
         return DayPhase.Day;
+    }
+
+    private void OnGameEvent (string type, object payload) {
+        if(nameof(GameState.daySkybox).Equals(payload)) 
+        {
+            if(PhaseFromHour(dayHour) != DayPhase.Night && GameState.daySkybox !=null) {
+                RenderSettings.skybox = GameState.daySkybox;
+            }
+        }
+        else if(nameof(GameState.nightSkybox).Equals(payload)) 
+        {
+            if(PhaseFromHour(dayHour) == DayPhase.Night && GameState.nightSkybox !=null) {
+                RenderSettings.skybox = GameState.nightSkybox;
+            }
+        }
+    }
+    private void OnDestroy()
+    {
+        GameEventController.RemoveListener(nameof(GameState), OnGameEvent);
     }
 }
 

@@ -5,6 +5,32 @@ public class GameState
     public static float gameTime24 {set; get;} = 12.0f;
     public static float maxCoinSpawnDistance {set; get;} = 30.0f;
 
+    #region SkyBoxes
+        private static Material _daySkybox;
+        public static Material daySkybox 
+        {
+            get => _daySkybox;
+            set {
+                if(value != _daySkybox) {
+                    _daySkybox = value;
+                    GameEventController.EmitEvent(nameof(GameState), nameof(daySkybox));
+                }
+            }
+        }
+
+        private static Material _nightSkybox;
+        public static Material nightSkybox 
+        {
+            get => _nightSkybox;
+            set {
+                if(value != _nightSkybox) {
+                    _nightSkybox = value;
+                    GameEventController.EmitEvent(nameof(GameState), nameof(nightSkybox));
+                }
+            }
+        }
+    #endregion
+
     #region activeSceneIndex
     public static int _activeSceneIndex = 0;
     public static int activeSceneIndex {

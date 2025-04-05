@@ -4,20 +4,25 @@ using UnityEngine;
 public class MenuQualityScript : MonoBehaviour
 {
     [SerializeField]
-    private Material[] daySkyBoxes;
+    private Material[] daySkyBoxes = new Material[0] ;
+    [SerializeField]
+    private Material[] nightSkyBoxes = new Material[0];
     private Material defauldSkyBox;
     private TMPro.TMP_Dropdown graphicsDropdown;
     private TMPro.TMP_Dropdown fogDropdown;
     private TMPro.TMP_Dropdown daySkyDropdown;
+    private TMPro.TMP_Dropdown nightSkyDropdown;
     void Start()
     {
         Transform layout = transform.Find("Content/Quality/Layout");
         graphicsDropdown = layout.Find("Graphics/Dropdown").GetComponent<TMPro.TMP_Dropdown>();
         fogDropdown = layout.Find("Fog/Dropdown").GetComponent<TMPro.TMP_Dropdown>();
         daySkyDropdown = layout.Find("DaySky/Dropdown").GetComponent<TMPro.TMP_Dropdown>();
+        nightSkyDropdown = layout.Find("NightSky/Dropdown").GetComponent<TMPro.TMP_Dropdown>();
         InitQualityDropdown();
         InitFogDropdown();
         InitDayDropdown();
+        InitNightDropdown();
         GameEventController.AddListener(nameof(GameState), OnGameStateEvent);
     }
     private void InitDayDropdown () {
@@ -28,14 +33,40 @@ public class MenuQualityScript : MonoBehaviour
         defauldSkyBox = RenderSettings.skybox;
         if(defauldSkyBox!=null) {
             daySkyDropdown.options.Add(new(defauldSkyBox.name));
-        }      
+            daySkyDropdown.value = daySkyBoxes.Length; 
+        }
+        else {
+            daySkyDropdown.value = -1;
+        }        
+    }
+    private void InitNightDropdown () {
+        nightSkyDropdown.ClearOptions();
+        foreach(Material m in nightSkyBoxes) {
+            nightSkyDropdown.options.Add(new(m.name));
+        }
+        defauldSkyBox = RenderSettings.skybox;
+        if(defauldSkyBox!=null) {
+            nightSkyDropdown.options.Add(new(defauldSkyBox.name));
+            nightSkyDropdown.value = nightSkyBoxes.Length;      
+        }
+        else {
+            nightSkyDropdown.value = -1;
+        }
     }
     public void OnDaySkyDropdownChange(int index) {
         if(index < daySkyBoxes.Length) {
-            RenderSettings.skybox = daySkyBoxes[index];
+           GameState.daySkybox = daySkyBoxes[index];
         } 
         else {
-            RenderSettings.skybox = defauldSkyBox;
+            GameState.daySkybox = defauldSkyBox;
+        }
+    }
+    public void OnNightSkyDropdownChange(int index) {
+        if(index < nightSkyBoxes.Length) {
+           GameState.nightSkybox = nightSkyBoxes[index];
+        } 
+        else {
+            GameState.nightSkybox = defauldSkyBox;
         }
     }
     private void InitFogDropdown () {
@@ -77,6 +108,7 @@ public class MenuQualityScript : MonoBehaviour
         if(nameof(GameState.activeSceneIndex).Equals(payload)) {
             InitFogDropdown();
             InitDayDropdown();
+            InitNightDropdown();
         }
     }
     void OnDestroy()
